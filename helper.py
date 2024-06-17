@@ -16,7 +16,18 @@ def force_pixels(image_path, colors_to_compare) -> Image:
                     closest_color = target_color
             img.putpixel((x, y), closest_color)
     return img
-    
+
+def delete_bg(image_path) -> Image:
+    img = Image.open(image_path)
+    img = img.convert('RGBA')
+    width, height = img.size
+    for y in range(height):
+        for x in range(width):
+            r,g,b,a = img.getpixel((x, y))
+            a=255-int((r+g+b)/3)
+            newcol = (r,g,b,a)
+            img.putpixel((x,y),newcol)
+    return img
 
 def upscale_image(image_path, scale) -> Image:
     img = Image.open(image_path)
@@ -42,17 +53,19 @@ def upscale_image(image_path, scale) -> Image:
 
 def main() -> None:
     while True:
-        image_path = input("image src: ")
-        image_out_path = input("image out: ")
+        image_path = "img\\"+input("image src: ")
+        image_out_path = "img\\"+input("image out: ")
         image:Image = None
         a = input("mode: ")
         if a == "setColors" or a == "sc":
-            rgb_colors = [(0,0,0),(255,255,255),(255,0,0)]
+            rgb_colors = [(76,76,76),(33,33,33),(127,127,127),(184,121,76)]
             #rgb_colors = [(0,0,0),(255,255,255),(255,0,0),(255,255,0),(0,0,255)]
             image = force_pixels(image_path, rgb_colors)
         if a == "upscale" or a == "us":
             scale = int(input("x:"))
             image = upscale_image(image_path, scale)
+        if a == "removeBg" or a == "bg":
+            image = delete_bg(image_path)
         if a == "q" or a == "quit":
             break
         image.show()
